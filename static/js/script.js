@@ -1,0 +1,298 @@
+const GPT_MODEL = 'gpt-4o';
+
+const userInputBox = document.getElementById('input_user');
+const messagesContainer = document.getElementById('messages');
+const buttonSend = document.getElementById('button_send');
+const buttonNewConversation = document.getElementById('button_new_conversation');
+const conversationListBox = document.getElementById('conversations');
+
+const currentConversation = {
+    uuid: undefined, 
+    statusFlag: false
+};
+
+function NewChatButton() {
+    createNewChat();
+    resetConversationLinkHighlights();
+    messagesContainer.innerHTML = '';
+}
+
+buttonNewConversation.onclick = NewChatButton;
+
+async function createNewChat(){
+    const response = await fetch('/api/create');
+
+    data = await response.json();
+
+    if (response.ok) {
+        currentConversation.uuid = data.uuid;
+        currentConversation.statusFlag = true;
+    }
+}
+
+buttonSend.onclick = async function() {
+    const userMessage = userInputBox.value;
+
+    if (userMessage === '')
+        return;
+
+    if (currentConversation.uuid === undefined)
+        return;
+
+    addMessageBlob('user', userMessage);
+    userInputBox.value = '';
+    updateSendButtonState()
+
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message_box message_ai typing';
+    typingIndicator.textContent = 'MikaGPT is thinking...';
+    messagesContainer.appendChild(typingIndicator)
+    scrollToBottom();
+
+    const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            model: GPT_MODEL, 
+            uuid: currentConversation.uuid, 
+            messages: [
+                {
+                    role: 'user', 
+                    content: userMessage
+                }
+            ]
+        })
+    })
+
+    const reply = await response.json();
+    addMessageBlob('assistant', reply);
+
+    typingIndicator.remove();
+
+    if (currentConversation.statusFlag) {
+        await reLoadConversationList();
+        document.getElementById(currentConversation.uuid).classList.add('active');
+        currentConversation.statusFlag = false;
+    }
+}
+
+function addMessageBlob(role, message) {
+    if (role === 'system')
+        return;
+
+    const message_box = document.createElement('div');
+    const buttonTTS = document.createElement('button');
+
+    buttonTTS.innerHTML = '🔊';
+    buttonTTS.className = 'button_tts';
+    buttonTTS.onclick = (event) => {
+        const text = getReadableMessage(event.target.parentElement.innerHTML);
+        playTTS(text);
+    };
+
+    // const display_role = role === 'user' ? 'YOU' : 'MikaGPT';
+    const class_name = role === 'user' ? 'message_user' : 'message_ai';
+
+    const marked_message = DOMPurify.sanitize(marked.parse(message));
+
+    message_box.className = `message_box ${class_name}`
+    message_box.innerHTML += marked_message;
+
+    message_box.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+    });
+
+    message_box.appendChild(buttonTTS);
+    messagesContainer.appendChild(message_box);
+
+    scrollToBottom();
+}
+
+async function reLoadConversationList() {
+    const response = await fetch('/api/convlist');
+    data = await response.json();
+    
+    if (response.ok) {
+        conversationListBox.innerHTML = '';
+
+        let oldDateString = undefined;
+
+        data.forEach(conversationInfo => {
+            const dateString = formatEpochToDateString(conversationInfo.last_edited);
+
+            if (oldDateString !== dateString) {
+                const dateIndicator = document.createElement('div');
+                dateIndicator.className = 'date_indicator';
+                dateIndicator.innerHTML = dateString;
+                conversationListBox.append(dateIndicator);
+            }
+
+            addConversationListElement(conversationInfo);
+
+            oldDateString = dateString;
+        });
+    }
+}
+
+function formatEpochToDateString(epochTime) {
+    const date = new Date(epochTime * 1000);
+    
+    const options = { month: 'short', day: 'numeric', year: 'numeric' };
+    const month = date.toLocaleString('en-US', { month: 'short' });
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    const suffix = (day) => {
+        if (day > 3 && day < 21) return 'th';
+        switch (day % 10) {
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
+        }
+    };
+
+    return `${month}. ${day}${suffix(day)} ${year}`;
+}
+
+async function deleteConversation(uuid) {
+    if (!confirm("Are you sure? This cannot be undone.")) {
+        return;
+    }
+
+    console.log('deleting ' + uuid);
+
+    const response = await fetch('/api/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            uuid: uuid, 
+        })
+    })
+
+    console.log(response);
+}
+
+function addConversationListElement(conversation) {
+    const link = document.createElement('a');
+    link.href = '#';
+    link.innerHTML = conversation.title === '' ? 'New Chat' : conversation.title;
+    link.className = 'conversation_link';
+    link.id = conversation.uuid;
+
+    link.addEventListener('click', function(event) {
+        if (currentConversation.uuid === event.target.id)
+            return;
+
+        resetConversationLinkHighlights();
+        event.target.classList.add('active');
+        currentConversation.uuid = conversation.uuid;
+        currentConversation.statusFlag = false;
+        loadCurrentConversationHistory();
+    });
+
+    const menuIcon = document.createElement('div');
+    menuIcon.innerHTML = '⋮';
+    menuIcon.className = 'button_chat_menu';
+
+    const dropMenu = document.createElement('div');
+    dropMenu.className = 'drop_menu';
+    
+    const buttonDelete = document.createElement('button');
+    buttonDelete.className = 'button_delete_chat';
+    buttonDelete.innerHTML = '🗑️';
+
+    buttonDelete.onclick = function (event) {
+        event.stopPropagation();
+        deleteConversation(this.parentElement.parentElement.parentElement.id);
+        reLoadConversationList();
+        NewChatButton();
+    }
+
+    dropMenu.appendChild(buttonDelete);
+    menuIcon.appendChild(dropMenu);
+    link.appendChild(menuIcon);
+
+    conversationListBox.appendChild(link);
+}
+
+function resetConversationLinkHighlights() {
+    const conversationLinks = document.getElementsByClassName('conversation_link');
+    [].forEach.call(conversationLinks, link => {
+        link.classList.remove('active');
+    });
+}
+
+async function loadCurrentConversationHistory() {
+    if (currentConversation.uuid === undefined)
+        return;
+
+    messagesContainer.innerHTML = '';
+
+    const response = await fetch('/api/history', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            uuid: currentConversation.uuid, 
+        })
+    })
+
+    if (response.ok) {
+        const history = await response.json();
+
+        history.forEach(message => {
+            addMessageBlob(message.role, message.content);
+        });
+    }
+}
+
+async function playTTS(text) {
+    const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            text: text, 
+        })
+    });
+
+    if (response.ok) {
+        const blob = await response.blob();
+        const audioURL = URL.createObjectURL(blob);
+        const audio = new Audio(audioURL);
+        
+        audio.play();
+        audio.onended = () => URL.revokeObjectURL(audioURL);
+    }
+}
+
+function getReadableMessage(target) {
+    const tempDiv = document.createElement('div');
+    
+    tempDiv.innerHTML = target;
+    tempDiv.querySelectorAll(['pre', 'button']).forEach(codeBlock => codeBlock.remove());
+
+    return tempDiv.textContent || tempDiv.innerText || '';
+}
+
+function scrollToBottom() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function updateSendButtonState() {
+    buttonSend.disabled = userInputBox.value.trim() === '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    reLoadConversationList();
+    createNewChat();
+});
+
+userInputBox.addEventListener('input', updateSendButtonState)

@@ -1,0 +1,7 @@
+piper
+venv
+voices/*
+chats/*
+voice.ogg
+downloads
+apikey.txt
