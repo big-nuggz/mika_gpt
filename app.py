@@ -75,6 +75,11 @@ def create_new_conversation_data():
     }
     return conversation_data
 
+def print_statistics(usage):
+    print(f'tokens in the generated completion: {usage.completion_tokens}')
+    print(f'tokens in the prompt: {usage.prompt_tokens}')
+    print(f'total tokens used in the request: {usage.total_tokens}')
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -110,6 +115,8 @@ def chat():
     )
 
     reply = completion.choices[0].message.content
+
+    print_statistics(completion.usage)
 
     conversation_data['full_history'].append({
             'role': 'assistant', 'content': reply

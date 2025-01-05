@@ -25,7 +25,7 @@ p {
     flex-direction: column;
     position: relative;
     scroll-behavior: smooth;
-    height: calc(100vh - (60px + 12px * 2));
+    height: calc(100vh - (90px + 12px * 2));
     overflow-y: scroll;
     padding: 12px;
 }
@@ -33,7 +33,7 @@ p {
 #container_input {
     display: flex;
     flex-direction: row;
-    height: 60px;
+    height: 90px;
     justify-content: flex-end;
     margin-top: 12px;
     margin-bottom: 12px;
@@ -154,6 +154,8 @@ p {
     background-color: #ffe3f4;
     padding: 12px;
     overflow: scroll;
+
+    scrollbar-width: none;
 }
 
 #conversations {
@@ -179,4 +181,7 @@ p {
 .button_tts {
     border: 0;
     margin-top: 12px;
+}
+
+#input_file {
 }

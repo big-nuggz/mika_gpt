@@ -5,6 +5,7 @@ const messagesContainer = document.getElementById('messages');
 const buttonSend = document.getElementById('button_send');
 const buttonNewConversation = document.getElementById('button_new_conversation');
 const conversationListBox = document.getElementById('conversations');
+const inputFile = document.getElementById('input_file');
 
 const currentConversation = {
     uuid: undefined, 
@@ -39,17 +40,7 @@ buttonSend.onclick = async function() {
     if (currentConversation.uuid === undefined)
         return;
 
-    addMessageBlob('user', userMessage);
-    userInputBox.value = '';
-    updateSendButtonState()
-
-    const typingIndicator = document.createElement('div');
-    typingIndicator.className = 'message_box message_ai typing';
-    typingIndicator.textContent = 'MikaGPT is thinking...';
-    messagesContainer.appendChild(typingIndicator)
-    scrollToBottom();
-
-    const response = await fetch('/api/chat', {
+    let payLoad =  {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -60,11 +51,40 @@ buttonSend.onclick = async function() {
             messages: [
                 {
                     role: 'user', 
-                    content: userMessage
+                    content: [
+                        {
+                            type: 'text', 
+                            text: userMessage
+                        }
+                    ]
                 }
             ]
         })
-    })
+    }
+
+    if (inputFile.files.length > 0) {
+        let body = JSON.parse(payLoad.body);
+        body.messages[0].content.push({
+            type: 'image_url', 
+            image_url: {
+                url: `data:${inputFile.files[0].type};base64,${await blobToBase64(inputFile.files[0])}`
+            }
+        });
+        payLoad.body = JSON.stringify(body);
+    }
+
+    addMessageBlob('user', JSON.parse(payLoad.body).messages[0].content);
+    userInputBox.value = '';
+    inputFile.value = '';
+    updateSendButtonState()
+
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message_box message_ai typing';
+    typingIndicator.textContent = 'MikaGPT is thinking...';
+    messagesContainer.appendChild(typingIndicator)
+    scrollToBottom();
+
+    const response = await fetch('/api/chat', payLoad)
 
     const reply = await response.json();
     addMessageBlob('assistant', reply);
@@ -78,12 +98,33 @@ buttonSend.onclick = async function() {
     }
 }
 
+function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    });
+}
+
 function addMessageBlob(role, message) {
     if (role === 'system')
         return;
 
     const message_box = document.createElement('div');
     const buttonTTS = document.createElement('button');
+    const image_box = document.createElement('img');
+
+    // for backwards compatibility (since now message can be an array, and all the old messages were pure text)
+    let text_message = null;
+    if (message instanceof Array) {
+        text_message = message[0].text;
+        if (message.length > 1) {
+            image_box.src = message[1].image_url.url;
+        }
+    }
+    else
+        text_message = message;
 
     buttonTTS.innerHTML = '🔊';
     buttonTTS.className = 'button_tts';
@@ -95,7 +136,7 @@ function addMessageBlob(role, message) {
     // const display_role = role === 'user' ? 'YOU' : 'MikaGPT';
     const class_name = role === 'user' ? 'message_user' : 'message_ai';
 
-    const marked_message = DOMPurify.sanitize(marked.parse(message));
+    const marked_message = DOMPurify.sanitize(marked.parse(text_message));
 
     message_box.className = `message_box ${class_name}`
     message_box.innerHTML += marked_message;
@@ -104,6 +145,7 @@ function addMessageBlob(role, message) {
         hljs.highlightElement(block);
     });
 
+    message_box.appendChild(image_box);
     message_box.appendChild(buttonTTS);
     messagesContainer.appendChild(message_box);
 
@@ -198,9 +240,15 @@ function addConversationListElement(conversation) {
     const menuIcon = document.createElement('div');
     menuIcon.innerHTML = '⋮';
     menuIcon.className = 'button_chat_menu';
+    menuIcon.onclick = function (event) {
+        event.stopPropagation();
+    }
 
     const dropMenu = document.createElement('div');
     dropMenu.className = 'drop_menu';
+    dropMenu.onclick = function (event) {
+        event.stopPropagation();
+    }
     
     const buttonDelete = document.createElement('button');
     buttonDelete.className = 'button_delete_chat';
