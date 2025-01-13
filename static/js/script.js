@@ -159,7 +159,8 @@ function addMessageBlob(role, message) {
     message_box.appendChild(buttonTTS);
     messagesContainer.appendChild(message_box);
 
-    renderMathInElement(message_box);
+    // renderMathInElement(message_box);
+    MathJax.typeset([message_box]);
     scrollToBottom();
 }
 
