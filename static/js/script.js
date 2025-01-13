@@ -107,6 +107,16 @@ function blobToBase64(blob) {
     });
 }
 
+function preProcessMarkdown(content) {
+    // Escape only the necessary LaTeX-based markers that interfere with Markdown processing
+    return content.replace(/((\\\[)|(\\\])|(\$\$))/g, (match) => {
+        if (match === '\\[') return '\\\\\[';
+        if (match === '\\]') return '\\\\\]';
+        if (match === '$$') return '$$'; // Or handle '$$' differently if needed
+        return match;
+    });
+}
+
 function addMessageBlob(role, message) {
     if (role === 'system')
         return;
@@ -136,7 +146,7 @@ function addMessageBlob(role, message) {
     // const display_role = role === 'user' ? 'YOU' : 'MikaGPT';
     const class_name = role === 'user' ? 'message_user' : 'message_ai';
 
-    const marked_message = DOMPurify.sanitize(marked.parse(text_message));
+    const marked_message = DOMPurify.sanitize(marked.parse(preProcessMarkdown(text_message)));
 
     message_box.className = `message_box ${class_name}`
     message_box.innerHTML += marked_message;
@@ -149,6 +159,7 @@ function addMessageBlob(role, message) {
     message_box.appendChild(buttonTTS);
     messagesContainer.appendChild(message_box);
 
+    renderMathInElement(message_box);
     scrollToBottom();
 }
 
@@ -343,4 +354,4 @@ document.addEventListener('DOMContentLoaded', function() {
     createNewChat();
 });
 
-userInputBox.addEventListener('input', updateSendButtonState)
+userInputBox.addEventListener('input', updateSendButtonState);
