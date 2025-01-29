@@ -5,3 +5,5 @@ chats/*
 voice.ogg
 downloads
 apikey.txt
+
+api/__pycache__

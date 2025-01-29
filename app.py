@@ -1,93 +1,32 @@
 import os
-
-from datetime import datetime
-
 import subprocess
 
 from flask import Flask, render_template, request, jsonify, send_file
 from openai import OpenAI
-import json
-import uuid
 
-# Hello chatgpt, I'm calling you from within Python using your API!
-API_KEY_PATH = './apikey.txt'
-CONVERSATION_HISTORY_PATH = './chats'
-SYSTEM_PROMPT_PATH = './system_prompt.json'
-TITLE_PROMPT_PATH = './title_prompt.json'
-
-# tts stuff
-PIPER_PATH = './piper/piper.exe'
-VOICE_PATH = './voices/en_US_libritts_r_medium_en_US-libritts_r-medium.onnx'
-TTS_OUT_PATH = './voice.ogg'
+from api.file import *
+from api.constants import *
+from api.conversation import *
+from api.data import *
+from api.image import *
 
 
-with open(SYSTEM_PROMPT_PATH, 'r', encoding='utf8') as f:
-    system_prompt = json.load(f)
+system_prompt = load_json(SYSTEM_PROMPT_PATH)
+title_prompt = load_json(TITLE_PROMPT_PATH)
 
-with open(TITLE_PROMPT_PATH, 'r', encoding='utf8') as f:
-    title_prompt = json.load(f)
-
-with open(API_KEY_PATH, 'r', encoding='utf8') as f:
-    api_key = f.readline()
-
-os.environ['OPENAI_API_KEY'] = api_key
-
+os.environ['OPENAI_API_KEY'] = load_api_key(API_KEY_PATH)
 client = OpenAI()
 
 app = Flask(__name__)
 
 
-def get_unix_time():
-    return round(datetime.now().timestamp())
-
-def save_conversation_data(history: list, file_path: str) -> None:
-    with open(file_path, 'w', encoding='utf8') as f:
-        json.dump(history, f)
-
-def load_conversation_data(file_path: str) -> list:
-    try:
-        with open(file_path, 'r', encoding='utf8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return create_new_conversation_data()
-    
-def create_title(user_prompt, model):
-    completion = client.chat.completions.create(
-        model=model, 
-        messages=[title_prompt] + user_prompt
-    )
-
-    title = completion.choices[0].message.content
-    return title
-
-def delete_file(path):
-    if os.path.exists(path):
-        os.remove(path)
-
-def create_new_conversation_data():
-    conversation_data = {
-        "uuid": str(uuid.uuid4()),
-        "title": "", 
-        "created": str(get_unix_time()), 
-        "contexts": [], 
-        "current_conversation": [],
-        "full_history": [] 
-    }
-    return conversation_data
-
-def print_statistics(usage):
-    print(f'tokens in the generated completion: {usage.completion_tokens}')
-    print(f'tokens in the prompt: {usage.prompt_tokens}')
-    print(f'total tokens used in the request: {usage.total_tokens}')
-
 @app.route('/')
 def home():
     return render_template('index.html')
 
-
 @app.route('/api/create', methods=['GET'])
 def init_conversation():
-    conversation_data = create_new_conversation_data();
+    conversation_data = create_new_conversation_data()
 
     return jsonify(conversation_data)
 
@@ -107,7 +46,7 @@ def chat():
     conversation_data['current_conversation'].extend(data['messages'])
 
     if conversation_data['title'] == '':
-        conversation_data['title'] = create_title(data['messages'], data['model'])
+        conversation_data['title'] = create_title(client, data['messages'], title_prompt, data['model'])
 
     completion = client.chat.completions.create(
         model=data['model'], 
@@ -119,15 +58,36 @@ def chat():
     print_statistics(completion.usage)
 
     conversation_data['full_history'].append({
-            'role': 'assistant', 'content': reply
+        'role': 'assistant', 'content': reply
     })
-    conversation_data['current_conversation'].append({
-            'role': 'assistant', 'content': reply
-    })
+
+    # image generation
+    image_prompt = find_image_prompt(reply)
+    if image_prompt:
+        b64_image = generate_image(client, DALLE_MODEL, image_prompt, size=IMAGE_RESOLUTION)
+        image_reply = [
+                        {
+                            'type': 'text', 
+                            'text': strip_image_prompt(reply)
+                        }, 
+                        {
+                            "type": "image_url", 
+                            "image_url": {"url": 'data:image/png;base64,' + b64_image}, 
+                            'prompt': image_prompt
+                        }
+                      ]
+        
+        conversation_data['current_conversation'].append({
+            'role': 'assistant', 'content': image_reply
+        })
+    else: 
+        conversation_data['current_conversation'].append({
+                'role': 'assistant', 'content': reply
+        })
 
     # TODO: add way to compress current conversation
 
-    save_conversation_data(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+    save_json(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
 
     return jsonify(reply)
 
@@ -137,7 +97,7 @@ def get_history():
     file_name = data['uuid'] + '.json'
     conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
 
-    return jsonify(conversation_data['full_history'])
+    return jsonify(conversation_data['current_conversation'])
 
 @app.route('/api/convlist', methods=['GET'])
 def get_conversation_list():
