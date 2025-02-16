@@ -1,5 +1,3 @@
-const GPT_MODEL = 'gpt-4o';
-
 const userInputBox = document.getElementById('input_user');
 const messagesContainer = document.getElementById('messages');
 const buttonSend = document.getElementById('button_send');
@@ -46,7 +44,7 @@ buttonSend.onclick = async function() {
             'Content-Type': 'application/json'
         }, 
         body: JSON.stringify({
-            model: GPT_MODEL, 
+            model: null, 
             uuid: currentConversation.uuid, 
             messages: [
                 {

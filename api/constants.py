@@ -4,6 +4,11 @@ CONVERSATION_HISTORY_PATH = './chats'
 SYSTEM_PROMPT_PATH = './system_prompt.json'
 TITLE_PROMPT_PATH = './title_prompt.json'
 
+# models
+MODEL_VISION = 'gpt-4o'
+MODEL_REASONING = 'o3-mini'
+MODEL_TITLING = 'gpt-4o-mini'
+
 # tts stuff
 PIPER_PATH = './piper/piper.exe'
 VOICE_PATH = './voices/en_US_libritts_r_medium_en_US-libritts_r-medium.onnx'

@@ -1,5 +1,7 @@
 import uuid
 
+import re
+
 from .file import load_json
 from .data import get_unix_time
 
@@ -36,3 +38,10 @@ def create_new_conversation_data() -> dict:
         "full_history": [] 
     }
     return conversation_data
+
+def has_image(conversation: dict) -> bool:
+    ''' checks if conversation dict has image in it or not '''
+    pattern = r'\'image_url\''
+    if re.search(pattern, str(conversation['current_conversation'])) is not None:
+        return True
+    return False

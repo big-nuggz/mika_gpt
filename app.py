@@ -46,10 +46,21 @@ def chat():
     conversation_data['current_conversation'].extend(data['messages'])
 
     if conversation_data['title'] == '':
-        conversation_data['title'] = create_title(client, data['messages'], title_prompt, data['model'])
+        conversation_data['title'] = create_title(client, data['messages'], title_prompt, MODEL_TITLING)
+
+    # if convo contains image, use model with vision, otherwise use reasoning model
+    # actually we're not doing this...yet
+    response_model = MODEL_VISION
+    if has_image(conversation_data):
+        # response_model = MODEL_VISION
+        print('this conversation contains image(s)')
+    # else:
+    #     response_model = MODEL_REASONING
+
+    print(f'using {response_model} to respond')
 
     completion = client.chat.completions.create(
-        model=data['model'], 
+        model=response_model, 
         messages=[system_prompt] + conversation_data['full_history']
     )
 
@@ -64,6 +75,7 @@ def chat():
     # image generation
     image_prompt = find_image_prompt(reply)
     if image_prompt:
+        print('image generation triggered')
         b64_image = generate_image(client, DALLE_MODEL, image_prompt, size=IMAGE_RESOLUTION)
         image_reply = [
                         {
@@ -89,7 +101,10 @@ def chat():
 
     save_json(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
 
-    return jsonify(reply)
+    if image_prompt:
+        return jsonify(image_reply)
+    else:
+        return jsonify(reply)
 
 @app.route('/api/history', methods=['POST'])
 def get_history():
