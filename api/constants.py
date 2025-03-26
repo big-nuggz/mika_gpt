@@ -5,7 +5,7 @@ CONVERSATION_HISTORY_PATH = './chats'
 SYSTEM_PROMPT_PATH = './system_prompt.json'
 TITLE_PROMPT_PATH = './title_prompt.json'
 
-SUPPLIER = 'GOOGLE' # OPENAI, GOOGLE
+SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 
 # models
 if SUPPLIER == 'OPENAI':

@@ -16,6 +16,8 @@ Download and put voice files of your choice in the `/voices`. Make sure to edit 
 ## Add API key
 Create a file called apikey_openai.txt or apikey_google.txt, paste your openai/google API key inside.
 ## Configure model
+You can either use OpenAI models or Google models. Google models as of now can be used for free. OpenAI models requires paid API access.
+
 api/constants.py for model configurations. See the source for further information.
 # Run
 `python app.py`
