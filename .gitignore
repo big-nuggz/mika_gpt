@@ -4,6 +4,7 @@ voices/*
 chats/*
 voice.ogg
 downloads
-apikey.txt
+apikey_openai.txt
+apikey_google.txt
 
 api/__pycache__

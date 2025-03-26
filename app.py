@@ -2,6 +2,7 @@ import os
 import subprocess
 
 from flask import Flask, render_template, request, jsonify, send_file
+
 from openai import OpenAI
 
 from api.file import *
@@ -14,8 +15,15 @@ from api.image import *
 system_prompt = load_json(SYSTEM_PROMPT_PATH)
 title_prompt = load_json(TITLE_PROMPT_PATH)
 
-os.environ['OPENAI_API_KEY'] = load_api_key(API_KEY_PATH)
-client = OpenAI()
+if SUPPLIER == 'OPENAI':
+    client = OpenAI(
+        api_key = load_api_key(API_KEY_PATH_OPENAI)
+    )
+elif SUPPLIER == 'GOOGLE':
+    client = OpenAI(
+        api_key = load_api_key(API_KEY_PATH_GOOGLE), 
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+        )
 
 app = Flask(__name__)
 

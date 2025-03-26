@@ -14,7 +14,9 @@ Get the piper binary from here, and unzip the content in to root directory. Path
 `/piper/piper.exe`
 Download and put voice files of your choice in the `/voices`. Make sure to edit `VOICE_PATH` in app.py so that it matches your chosen voice file. 
 ## Add API key
-Create a file called apikey.txt, paste your openai API key inside.
+Create a file called apikey_openai.txt or apikey_google.txt, paste your openai/google API key inside.
+## Configure model
+api/constants.py for model configurations. See the source for further information.
 # Run
 `python app.py`
 It should give you a localhost URL in the console to access from your browser.
