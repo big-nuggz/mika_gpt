@@ -56,7 +56,7 @@ def chat():
     if conversation_data['title'] == '':
         conversation_data['title'] = create_title(client, data['messages'], title_prompt, MODEL_TITLING)
 
-    # if convo contains image, use model with vision, otherwise use reasoning model
+    # if convo contains image, use model with vision, otherwise use most intelligent text-only model
     response_model = MODEL_VISION
     if has_image(conversation_data):
         # response_model = MODEL_VISION
