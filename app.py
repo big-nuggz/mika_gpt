@@ -57,13 +57,12 @@ def chat():
         conversation_data['title'] = create_title(client, data['messages'], title_prompt, MODEL_TITLING)
 
     # if convo contains image, use model with vision, otherwise use reasoning model
-    # actually we're not doing this...yet
     response_model = MODEL_VISION
     if has_image(conversation_data):
         # response_model = MODEL_VISION
         print('this conversation contains image(s)')
-    # else:
-    #     response_model = MODEL_REASONING
+    else:
+        response_model = MODEL_NON_VISION
 
     print(f'using {response_model} to respond')
 

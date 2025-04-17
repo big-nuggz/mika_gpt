@@ -11,8 +11,8 @@ SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 if SUPPLIER == 'OPENAI':
     # openai models
     MODEL_VISION = 'gpt-4o'
-    MODEL_REASONING = 'o3-mini'
-    MODEL_TITLING = 'gpt-4o-mini'
+    MODEL_NON_VISION = 'gpt-4.1'
+    MODEL_TITLING = 'gpt-4.1-nano'
 
     # image (dall-e)
     DALLE_MODEL = 'dall-e-2'
@@ -20,7 +20,7 @@ if SUPPLIER == 'OPENAI':
 elif SUPPLIER == 'GOOGLE':
     # google models
     MODEL_VISION = 'gemini-2.0-flash'
-    MODEL_REASONING = 'gemini-2.0-flash'
+    MODEL_NON_VISION = 'gemini-2.0-flash'
     MODEL_TITLING = 'gemini-2.0-flash-lite'
 
     # image (imagen)
