@@ -10,10 +10,12 @@ from api.constants import *
 from api.conversation import *
 from api.data import *
 from api.image import *
+from api.tokens import get_token_count_from_chat
 
 
 system_prompt = load_json(SYSTEM_PROMPT_PATH)
 title_prompt = load_json(TITLE_PROMPT_PATH)
+compression_prompt = load_json(COMPRESSION_PROMPT_PATH)
 
 if SUPPLIER == 'OPENAI':
     client = OpenAI(
@@ -50,9 +52,6 @@ def chat():
     if data['uuid'] != conversation_data['uuid']:
         conversation_data['uuid'] = data['uuid']
 
-    conversation_data['full_history'].extend(data['messages'])
-    conversation_data['current_conversation'].extend(data['messages'])
-
     if conversation_data['title'] == '':
         conversation_data['title'] = create_title(client, data['messages'], title_prompt, MODEL_TITLING)
 
@@ -66,9 +65,33 @@ def chat():
 
     print(f'using {response_model} to respond')
 
+    # if context is too long, compress it
+    current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
+    if current_token_count >= TOKEN_COMPRESSION_LIMIT:
+        print(f'token limit exceeded. tokens: {current_token_count}')
+        print(f'compressing...')
+
+        # compression
+        completion = client.chat.completions.create(
+            model=response_model, 
+            messages=conversation_data['current_conversation'] + [compression_prompt])
+        
+        reply = completion.choices[0].message.content
+
+        conversation_data['current_conversation'] = [{
+                'role': 'assistant', 'content': reply
+        }]
+
+        current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
+        print(f'token count after compression: {current_token_count}')
+
+    # reply
+    conversation_data['full_history'].extend(data['messages'])
+    conversation_data['current_conversation'].extend(data['messages'])
+
     completion = client.chat.completions.create(
         model=response_model, 
-        messages=[system_prompt] + conversation_data['full_history']
+        messages=[system_prompt] + conversation_data['current_conversation']
     )
 
     reply = completion.choices[0].message.content
@@ -92,19 +115,20 @@ def chat():
                         {
                             "type": "image_url", 
                             "image_url": {"url": 'data:image/png;base64,' + b64_image}, 
-                            'prompt': image_prompt
+                            # 'prompt': image_prompt
                         }
                       ]
         
         conversation_data['current_conversation'].append({
             'role': 'assistant', 'content': image_reply
         })
+        conversation_data['full_history'].append({
+            'role': 'assistant', 'content': image_reply
+        })
     else: 
         conversation_data['current_conversation'].append({
                 'role': 'assistant', 'content': reply
         })
-
-    # TODO: add way to compress current conversation
 
     save_json(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
 

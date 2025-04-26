@@ -10,7 +10,7 @@ def generate_image(client: OpenAI, model: str, prompt: str, size='512x512', qual
         model=model,
         prompt=prompt,
         size=size,
-        quality=quality,
+        # quality=quality, # seems to cause error atm
         response_format='b64_json', 
         n=1,
     )

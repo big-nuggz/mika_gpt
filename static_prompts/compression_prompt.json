@@ -1,0 +1,4 @@
+{
+    "role": "system", 
+    "content": "This chat has exceeded the token limit, and will be compressed according to your chat summary. Please summarize the entire chat up to this point, as comprehensively as possible, including your role and task. Write your current role/task in a way as it's a reminder to yourself. Ensure that the following chat will be a smooth continuation to the existing chat. If the summarization already exist at the beginning of this chat (meaning, compression has already happened in the past), make sure to include as much information from that old summary into your new summary as well, so the loss of memory and context will be minimal over the lifetime of this chat."
+}

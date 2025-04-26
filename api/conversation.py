@@ -7,6 +7,7 @@ from .data import get_unix_time
 
 from openai import OpenAI
 
+
 def create_title(client: OpenAI, user_prompt: dict, title_prompt: dict, model: str) -> str:
     ''' returns a title of the conversation based on given prompt '''
     completion = client.chat.completions.create(

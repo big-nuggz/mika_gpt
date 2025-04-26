@@ -1,14 +1,23 @@
+import tiktoken
+
+
 # paths
 API_KEY_PATH_OPENAI = './apikey_openai.txt'
 API_KEY_PATH_GOOGLE = './apikey_google.txt'
 CONVERSATION_HISTORY_PATH = './chats'
-SYSTEM_PROMPT_PATH = './system_prompt.json'
-TITLE_PROMPT_PATH = './title_prompt.json'
+SYSTEM_PROMPT_PATH = './static_prompts/system_prompt.json'
+TITLE_PROMPT_PATH = './static_prompts/title_prompt.json'
+COMPRESSION_PROMPT_PATH = './static_prompts/compression_prompt.json'
 
 SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 
+TOKEN_COMPRESSION_LIMIT = 15000 # if token count in chat exceeds this, compress the chat
+
 # models
 if SUPPLIER == 'OPENAI':
+    # tokenizer
+    TOKEN_ENCODER = tiktoken.encoding_for_model('gpt-4o')
+
     # openai models
     MODEL_VISION = 'gpt-4.1'
     MODEL_NON_VISION = 'gpt-4.1'
@@ -18,6 +27,10 @@ if SUPPLIER == 'OPENAI':
     DALLE_MODEL = 'dall-e-2'
     IMAGE_RESOLUTION = '256x256'
 elif SUPPLIER == 'GOOGLE':
+    # tokenizer
+    # TODO fill this
+    # TOKEN_ENCODER = 
+
     # google models
     MODEL_VISION = 'gemini-2.0-flash'
     MODEL_NON_VISION = 'gemini-2.0-flash'
