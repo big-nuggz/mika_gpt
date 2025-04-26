@@ -143,7 +143,7 @@ def get_history():
     file_name = data['uuid'] + '.json'
     conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
 
-    return jsonify(conversation_data['current_conversation'])
+    return jsonify(conversation_data['full_history'])
 
 @app.route('/api/convlist', methods=['GET'])
 def get_conversation_list():
