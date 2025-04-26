@@ -10,7 +10,7 @@ SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 # models
 if SUPPLIER == 'OPENAI':
     # openai models
-    MODEL_VISION = 'gpt-4o'
+    MODEL_VISION = 'gpt-4.1'
     MODEL_NON_VISION = 'gpt-4.1'
     MODEL_TITLING = 'gpt-4.1-nano'
 
