@@ -79,11 +79,8 @@ def chat():
         reply = completion.choices[0].message.content
 
         conversation_data['current_conversation'] = [{
-            'role': 'assistant', 'content': reply
+                'role': 'assistant', 'content': reply
         }]
-        conversation_data['full_history'].append({
-            'role': 'assistant', 'content': reply
-        })
 
         current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
         print(f'token count after compression: {current_token_count}')
