@@ -185,3 +185,7 @@ p {
 
 #input_file {
 }
+
+.message_box p:not(:last-child) {
+    padding-bottom: 1em;
+}
