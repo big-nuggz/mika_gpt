@@ -82,6 +82,11 @@ def chat():
                 'role': 'assistant', 'content': reply
         }]
 
+        # save the past compression contexts, for future reference
+        conversation_data["contexts"].append({
+                'role': 'assistant', 'content': reply
+        })
+
         current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
         print(f'token count after compression: {current_token_count}')
 
