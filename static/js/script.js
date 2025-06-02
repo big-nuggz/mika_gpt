@@ -4,16 +4,23 @@ const buttonSend = document.getElementById('button_send');
 const buttonNewConversation = document.getElementById('button_new_conversation');
 const conversationListBox = document.getElementById('conversations');
 const inputFile = document.getElementById('input_file');
+const buttonContext = document.getElementById('button_context');
 
 const currentConversation = {
     uuid: undefined, 
     statusFlag: false
 };
 
+const globalState = {
+    viewingContext: false
+};
+
 function NewChatButton() {
     createNewChat();
     resetConversationLinkHighlights();
     messagesContainer.innerHTML = '';
+    buttonContext.id = currentConversation.uuid;
+    globalState.viewingContext = false;
 }
 
 buttonNewConversation.onclick = NewChatButton;
@@ -27,6 +34,38 @@ async function createNewChat(){
         currentConversation.uuid = data.uuid;
         currentConversation.statusFlag = true;
     }
+}
+
+buttonContext.onclick = async function(){
+    if (currentConversation.uuid === undefined)
+        return;
+
+    if (globalState.viewingContext){
+        loadCurrentConversationHistory();
+        return;
+    }
+
+    messagesContainer.innerHTML = '';
+
+    const response = await fetch('/api/context', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            uuid: currentConversation.uuid, 
+        })
+    })
+
+    if (response.ok) {
+        const history = await response.json();
+
+        history.forEach(message => {
+            addMessageBlob(message.role, message.content);
+        });
+    }
+
+    globalState.viewingContext = true;
 }
 
 buttonSend.onclick = async function() {
@@ -308,6 +347,9 @@ async function loadCurrentConversationHistory() {
             addMessageBlob(message.role, message.content);
         });
     }
+
+    buttonContext.id = currentConversation.uuid;
+    globalState.viewingContext = false;
 }
 
 async function playTTS(text) {

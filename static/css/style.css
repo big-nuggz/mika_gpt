@@ -189,3 +189,7 @@ p {
 .message_box p:not(:last-child) {
     padding-bottom: 1em;
 }
+
+#button_context {
+    position: absolute;
+}

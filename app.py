@@ -150,6 +150,14 @@ def get_history():
 
     return jsonify(conversation_data['full_history'])
 
+@app.route('/api/context', methods=['POST'])
+def get_contexts():
+    data = request.json
+    file_name = data['uuid'] + '.json'
+    conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+
+    return jsonify(conversation_data['contexts'])
+
 @app.route('/api/convlist', methods=['GET'])
 def get_conversation_list():
     file_list = os.listdir(CONVERSATION_HISTORY_PATH)
