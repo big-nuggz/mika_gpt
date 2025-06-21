@@ -7,7 +7,7 @@ def get_token_count_from_string(text: str, encoder: tiktoken.Encoding) -> int:
     '''
     return len(encoder.encode(text))
 
-def get_token_count_from_chat(chat: dict, encoder: tiktoken.Encoding, estimate_image_token=True) -> int:
+def get_token_count_from_chat(chat: list, encoder: tiktoken.Encoding, estimate_image_token=True) -> int:
     '''
     returns token count of entire chat
 

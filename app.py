@@ -78,9 +78,12 @@ def chat():
         
         reply = completion.choices[0].message.content
 
-        conversation_data['current_conversation'] = [{
+        # keep the last user message and a response, for better continuity
+        # will sacrifice some tokens but probably better experience
+        conversation_data['current_conversation'] = conversation_data['current_conversation'][-2:]
+        conversation_data['current_conversation'].append({
                 'role': 'assistant', 'content': reply
-        }]
+        })
 
         # save the past compression contexts, for future reference
         conversation_data["contexts"].append({
