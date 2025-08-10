@@ -19,9 +19,9 @@ if SUPPLIER == 'OPENAI':
     TOKEN_ENCODER = tiktoken.encoding_for_model('gpt-4o')
 
     # openai models
-    MODEL_VISION = 'gpt-4.1'
-    MODEL_NON_VISION = 'gpt-4.1'
-    MODEL_TITLING = 'gpt-4.1-nano'
+    MODEL_VISION = 'gpt-5-chat-latest'
+    MODEL_NON_VISION = 'gpt-5-chat-latest'
+    MODEL_TITLING = 'gpt-5-nano'
 
     # image (dall-e)
     DALLE_MODEL = 'dall-e-2'
