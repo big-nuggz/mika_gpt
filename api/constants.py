@@ -8,6 +8,7 @@ CONVERSATION_HISTORY_PATH = './chats'
 SYSTEM_PROMPT_PATH = './static_prompts/system_prompt.json'
 TITLE_PROMPT_PATH = './static_prompts/title_prompt.json'
 COMPRESSION_PROMPT_PATH = './static_prompts/compression_prompt.json'
+SUMMARIZER_PROMPT_PATH = './static_prompts/summarizer_prompt.json'
 
 SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 
@@ -22,6 +23,7 @@ if SUPPLIER == 'OPENAI':
     MODEL_VISION = 'gpt-5-chat-latest'
     MODEL_NON_VISION = 'gpt-5-chat-latest'
     MODEL_TITLING = 'gpt-5-nano'
+    MODEL_SUMMARIZER = 'gpt-5-nano'
 
     # image (dall-e)
     DALLE_MODEL = 'dall-e-2'
@@ -35,6 +37,7 @@ elif SUPPLIER == 'GOOGLE':
     MODEL_VISION = 'gemini-2.0-flash'
     MODEL_NON_VISION = 'gemini-2.0-flash'
     MODEL_TITLING = 'gemini-2.0-flash-lite'
+    MODEL_SUMMARIZER = 'gemini-2.0-flash-lite'
 
     # image (imagen)
     DALLE_MODEL = 'imagen-3.0-generate-002'

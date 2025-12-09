@@ -8,3 +8,7 @@ apikey_openai.txt
 apikey_google.txt
 
 api/__pycache__
+
+batch.jsonl
+batch_result.jsonl
+test_rag.py
