@@ -43,6 +43,10 @@ elif SUPPLIER == 'GOOGLE':
     DALLE_MODEL = 'imagen-3.0-generate-002'
     IMAGE_RESOLUTION = '256x256'
 
+# text embedding model, from HF
+EMBED_MODEL = 'intfloat/multilingual-e5-small' # this one's reasonably small and fast to run locally
+EMBED_WORKER_PATH = 'embed_worker.py'
+
 # tts stuff
 PIPER_PATH = './piper/piper.exe'
 VOICE_PATH = './voices/en_US_libritts_r_medium_en_US-libritts_r-medium.onnx'
