@@ -7,7 +7,7 @@ downloads
 apikey_openai.txt
 apikey_google.txt
 
-api/__pycache__
+**/__pycache__
 
 batch.jsonl
 batch_result.jsonl

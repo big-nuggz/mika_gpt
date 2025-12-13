@@ -2,7 +2,7 @@ import sys
 import subprocess
 import json
 
-from .constants import EMBED_WORKER_PATH
+from ..constants import EMBED_WORKER_PATH
 
 
 def start_embed_worker(text: str) -> subprocess.Popen:

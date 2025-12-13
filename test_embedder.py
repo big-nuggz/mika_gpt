@@ -1,5 +1,5 @@
 # test code
-from api.embedder import *
+from api.rag.embedder import *
 
 
 if __name__ == '__main__':
