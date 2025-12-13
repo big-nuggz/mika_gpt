@@ -2,6 +2,7 @@ piper
 venv
 voices/*
 chats/*
+memory/*
 voice.ogg
 downloads
 apikey_openai.txt
