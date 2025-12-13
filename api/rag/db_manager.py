@@ -65,8 +65,8 @@ class DBManager():
         '''
         cursor = self.db.cursor()
         cursor.execute(
-            'SELECT id role text metadata timestamp FROM archive WHERE id=?', 
-            (memory_id))
+            'SELECT id, role, text, timestamp, metadata FROM archive WHERE id=?', 
+            (memory_id,))
         ret = cursor.fetchone()
 
         if not ret:
@@ -87,7 +87,7 @@ class DBManager():
         cursor = self.db.cursor()
         cursor.execute(
             'SELECT id, conversation_id, embedding FROM archive WHERE conversation_id=?', 
-            (conversation_id))
+            (conversation_id,))
 
         ids = []
         embeddings = []
