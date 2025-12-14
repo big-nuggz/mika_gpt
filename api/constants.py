@@ -52,7 +52,8 @@ PIPER_PATH = './piper/piper.exe'
 VOICE_PATH = './voices/en_US_libritts_r_medium_en_US-libritts_r-medium.onnx'
 TTS_OUT_PATH = './voice.ogg'
 
-
+# long-term memory storage path
+MEMORY_DB_PATH = './memory/archive.db'
 
 # regex string for image prompt search
 IMAGE_PROMPT_SEARCH_STRING = r'\{IMAGE_PROMPT\}(.+)\{\/IMAGE_PROMPT\}'
