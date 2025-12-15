@@ -53,6 +53,12 @@ TTS_OUT_PATH = './voice.ogg'
 # long-term memory storage path
 MEMORY_DB_PATH = './memory/archive.db'
 
+# batch memory update worker path
+BATCH_MEMORY_WORKER_PATH = 'batch_memory_worker.py'
+
+# temporary batch memory job json file path
+BATCH_MEMORY_JOB_PATH = 'batch_memory.json'
+
 # regex string for image prompt search
 IMAGE_PROMPT_SEARCH_STRING = r'\{IMAGE_PROMPT\}(.+)\{\/IMAGE_PROMPT\}'
 

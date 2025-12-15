@@ -46,6 +46,7 @@ If a date of the memory can be inferred from the chat, make sure to include it i
 Your output will be directly interpreted by a program, which will handle the database update.
 Your output must not include any non-memory statement, unnecessary formatting, brackets etc.
 Only output memory statements text, with each memory written in single line each.
+Do not insert any empty lines between each memory statements.
 Make sure to extract anything and everything that could be referenced in future.
 
 End of instructions. Please now extract the memories from the given chat history, as instructed.

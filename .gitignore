@@ -13,3 +13,5 @@ apikey_google.txt
 batch.jsonl
 batch_result.jsonl
 test_rag.py
+
+batch_memory.json

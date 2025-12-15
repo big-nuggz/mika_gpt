@@ -12,7 +12,7 @@ class DBManager():
         '''
         self.path = path
 
-        self.db = sqlite3.connect(self.path)
+        self.db = sqlite3.connect(self.path, check_same_thread=False)
         self._init_table()
     
     def _init_table(self):
@@ -83,6 +83,7 @@ class DBManager():
         '''
         returns array of ids and embeddings for every archival memory of specific convo
         pass this onto the vector searcher yay
+        return None if no memory is present under the conversation id
         '''
         cursor = self.db.cursor()
         cursor.execute(
@@ -92,7 +93,12 @@ class DBManager():
         ids = []
         embeddings = []
 
-        for raw_id, _, embedding_blob in cursor.fetchall():
+        data = cursor.fetchall()
+
+        if not data:
+            return None
+
+        for raw_id, _, embedding_blob in data:
             embedding = np.frombuffer(embedding_blob, dtype=np.float32)
             ids.append(raw_id)
             embeddings.append(embedding)
