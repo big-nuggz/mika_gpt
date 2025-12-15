@@ -8,7 +8,7 @@ CONVERSATION_HISTORY_PATH = './chats'
 
 SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 
-TOKEN_COMPRESSION_LIMIT = 15000 # if token count in chat exceeds this, compress the chat
+TOKEN_COMPRESSION_LIMIT = 10000 # if token count in chat exceeds this, compress the chat
 
 # models
 if SUPPLIER == 'OPENAI':
@@ -18,8 +18,9 @@ if SUPPLIER == 'OPENAI':
     # openai models
     MODEL_VISION = 'gpt-5.2-chat-latest'
     MODEL_NON_VISION = 'gpt-5.2-chat-latest'
-    MODEL_TITLING = 'gpt-5-nano'
+    MODEL_TITLING = 'gpt-5-nano' # tiniest model for titling
     MODEL_SUMMARIZER = 'gpt-5-nano'
+    MODEL_SMALL_WORKER = 'gpt-5-nano' # used for memory update and such, where small cheap model is enough
 
     # image (dall-e)
     DALLE_MODEL = 'dall-e-2'
@@ -34,6 +35,7 @@ elif SUPPLIER == 'GOOGLE':
     MODEL_NON_VISION = 'gemini-2.0-flash'
     MODEL_TITLING = 'gemini-2.0-flash-lite'
     MODEL_SUMMARIZER = 'gemini-2.0-flash-lite'
+    MODEL_SMALL_WORKER = 'gemini-2.0-flash-lite'
 
     # image (imagen)
     DALLE_MODEL = 'imagen-3.0-generate-002'
@@ -53,3 +55,6 @@ MEMORY_DB_PATH = './memory/archive.db'
 
 # regex string for image prompt search
 IMAGE_PROMPT_SEARCH_STRING = r'\{IMAGE_PROMPT\}(.+)\{\/IMAGE_PROMPT\}'
+
+# regex string for core memory update prompt search
+CORE_MEMORY_UPDATE_PROMPT_SEARCH_STRING = r'\{CORE\}(.*?)\{\/CORE\}'

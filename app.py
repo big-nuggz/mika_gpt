@@ -14,12 +14,14 @@ from api.tokens import get_token_count_from_chat
 
 from api.rag.db_manager import DBManager
 from api.rag.vector_search import normalize_embeddings, search_with_query
+from api.rag.interface import find_core_memory_update_prompt, strip_core_memory_update_prompt
 
 from static_prompts.compression_prompt import compression_prompt
 from static_prompts.default_core_memory import default_core_memory
 from static_prompts.memory_extractor_prompt import memory_extractor_prompt
 from static_prompts.system_prompt import system_prompt
 from static_prompts.title_prompt import title_prompt
+from static_prompts.core_memory_update_prompt import core_memory_update_prompt
 
 
 # init DB
@@ -62,6 +64,10 @@ def chat():
 
     if conversation_data['title'] == '':
         conversation_data['title'] = create_title(client, data['messages'], title_prompt, MODEL_TITLING)
+
+    # check for core memory, if it doesn't exist, insert the default one
+    if 'core_memory' not in conversation_data.keys():
+        conversation_data['core_memory'] = [default_core_memory]
 
     # if convo contains image, use model with vision, otherwise use most intelligent text-only model
     response_model = MODEL_VISION
@@ -107,7 +113,7 @@ def chat():
 
     completion = client.chat.completions.create(
         model=response_model, 
-        messages=[system_prompt] + conversation_data['current_conversation']
+        messages=[system_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation']
     )
 
     reply = completion.choices[0].message.content
@@ -117,6 +123,26 @@ def chat():
     conversation_data['full_history'].append({
         'role': 'assistant', 'content': reply
     })
+
+    # core memory update
+    core_update = find_core_memory_update_prompt(reply)
+    if core_update:
+        print('core memory update triggered')
+        completion = client.chat.completions.create(
+            model=MODEL_SMALL_WORKER, 
+            messages=[core_memory_update_prompt] + conversation_data['core_memory'] + [{
+                'role': 'system', 
+                'content': core_update
+            }]
+        )
+
+        new_core_memory = completion.choices[0].message.content
+        conversation_data['core_memory'] = [{
+                'role': 'system', 
+                'content': new_core_memory
+            }]
+
+        reply = strip_core_memory_update_prompt(reply)
 
     # image generation
     image_prompt = find_image_prompt(reply)

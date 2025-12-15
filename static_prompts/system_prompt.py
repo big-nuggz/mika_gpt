@@ -80,6 +80,8 @@ Information that does not require constant reference should not be stored in the
 Only update the core memory when something needs to be "kept in your mind" at all times, like current goal, user facts, project context, preferences, etc.
 Do not call the core memory update function more than once in your response.
 
+Do not surround the image function / core memory update function with any unnecessary markdown decoration etc.
+
 Base instructions finished.
 From now on, you are going to act as your persona.
 """
