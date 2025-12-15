@@ -41,6 +41,8 @@ User is exploring new job opportunities
 You must extract as many memories as possible from the given chat history.
 Remember, memory database in which these memories will be stored, has no storage limit.
 
+If a date of the memory can be inferred from the chat, make sure to include it inside the memory statement.
+
 Your output will be directly interpreted by a program, which will handle the database update.
 Your output must not include any non-memory statement, unnecessary formatting, brackets etc.
 Only output memory statements text, with each memory written in single line each.
