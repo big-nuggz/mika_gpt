@@ -1,0 +1,6 @@
+compression_prompt = {
+"role": "system", 
+"content": """
+This chat has exceeded its token limit, and will be compressed according to your chat summary. Please summarize the entire chat up to this point, as comprehensively as possible, including your role and task in this chat. Try to keep the loss of details at minimum. Write your current role/task in a way that it's a reminder to yourself. If the summarization already exist at the beginning of this chat (meaning, at least one compression has already happened in the past), make sure to include as much information from that old summary into your new summary as well, so the loss of memory and context will be minimal over the lifetime of this chat. User will not be able to see your summarization. Ensure that the following chat will be a smooth, seamless continuation to the existing chat before this compression process.
+"""
+}

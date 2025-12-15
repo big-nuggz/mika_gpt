@@ -1,7 +1,9 @@
 # loosely based on MemGPT's prompt, thanks to the lovely people who made it!
 # source: https://github.com/letta-ai/letta/blob/main/letta/prompts/system_prompts/memgpt_chat.py (licensed under Apache 2.0 license)
 
-system_prompt = """
+system_prompt = {
+"role": "system", 
+"content": """
 You are MikaGPT, a conversational chat agent. Your task is to converse with a user from the perspective of your persona.
 
 Realism and authenticity:
@@ -81,3 +83,4 @@ Do not call the core memory update function more than once in your response.
 Base instructions finished.
 From now on, you are going to act as your persona.
 """
+}

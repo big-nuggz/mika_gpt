@@ -12,10 +12,18 @@ from api.data import *
 from api.image import *
 from api.tokens import get_token_count_from_chat
 
+from api.rag.db_manager import DBManager
+from api.rag.vector_search import normalize_embeddings, search_with_query
 
-system_prompt = load_json(SYSTEM_PROMPT_PATH)
-title_prompt = load_json(TITLE_PROMPT_PATH)
-compression_prompt = load_json(COMPRESSION_PROMPT_PATH)
+from static_prompts.compression_prompt import compression_prompt
+from static_prompts.default_core_memory import default_core_memory
+from static_prompts.memory_extractor_prompt import memory_extractor_prompt
+from static_prompts.system_prompt import system_prompt
+from static_prompts.title_prompt import title_prompt
+
+
+# init DB
+memory_database = DBManager(MEMORY_DB_PATH)
 
 if SUPPLIER == 'OPENAI':
     client = OpenAI(
@@ -74,7 +82,7 @@ def chat():
         # compression
         completion = client.chat.completions.create(
             model=response_model, 
-            messages=conversation_data['current_conversation'] + [compression_prompt])
+            messages=[compression_prompt] + conversation_data['current_conversation'])
         
         reply = completion.choices[0].message.content
 

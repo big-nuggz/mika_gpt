@@ -5,10 +5,6 @@ import tiktoken
 API_KEY_PATH_OPENAI = './apikey_openai.txt'
 API_KEY_PATH_GOOGLE = './apikey_google.txt'
 CONVERSATION_HISTORY_PATH = './chats'
-SYSTEM_PROMPT_PATH = './static_prompts/system_prompt.json'
-TITLE_PROMPT_PATH = './static_prompts/title_prompt.json'
-COMPRESSION_PROMPT_PATH = './static_prompts/compression_prompt.json'
-SUMMARIZER_PROMPT_PATH = './static_prompts/summarizer_prompt.json'
 
 SUPPLIER = 'OPENAI' # OPENAI, GOOGLE
 
@@ -20,8 +16,8 @@ if SUPPLIER == 'OPENAI':
     TOKEN_ENCODER = tiktoken.encoding_for_model('gpt-4o')
 
     # openai models
-    MODEL_VISION = 'gpt-5-chat-latest'
-    MODEL_NON_VISION = 'gpt-5-chat-latest'
+    MODEL_VISION = 'gpt-5.2-chat-latest'
+    MODEL_NON_VISION = 'gpt-5.2-chat-latest'
     MODEL_TITLING = 'gpt-5-nano'
     MODEL_SUMMARIZER = 'gpt-5-nano'
 
