@@ -12,7 +12,7 @@ if __name__ == '__main__':
     """
 
     # start the worker
-    worker = start_embed_worker(text)
+    worker = start_embed_worker([text, "another text"])
 
     # do some stuff while worker is running
     import time

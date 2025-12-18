@@ -5,16 +5,22 @@ import json
 from ..constants import EMBED_WORKER_PATH
 
 
-def start_embed_worker(text: str) -> subprocess.Popen:
+def start_embed_worker(texts: list) -> subprocess.Popen:
     '''
-    starts the embedding process 
+    starts the embedding process
+
+    input: list of strings 
     '''
     worker = subprocess.Popen(
-        [sys.executable, EMBED_WORKER_PATH, text], 
+        [sys.executable, EMBED_WORKER_PATH], 
+        stdin=subprocess.PIPE,
         stdout=subprocess.PIPE, 
         stderr=subprocess.PIPE,
         text=True 
     )
+
+    worker.stdin.write(json.dumps(texts))
+    worker.stdin.close()
 
     return worker
 

@@ -6,13 +6,15 @@ from sentence_transformers import SentenceTransformer
 from api.constants import EMBED_MODEL
 
 
+data = input()
+
 model = SentenceTransformer(EMBED_MODEL)
 
+data = json.loads(data)
+embeddings = []
 
-if len(sys.argv) < 2:
-    sys.exit()
+for text in data:
+    embedding = model.encode(text).tolist()
+    embeddings.append(embedding)
 
-text = sys.argv[1]
-embedding = model.encode(text).tolist()
-
-print(json.dumps({'embedding': embedding}))
+print(json.dumps(embeddings))
