@@ -13,7 +13,7 @@ from api.image import *
 from api.tokens import get_token_count_from_chat
 
 from api.rag.db_manager import DBManager
-from api.rag.vector_search import normalize_embeddings, search_with_query
+from api.rag.vector_search import normalize_embeddings, search_with_queries
 from api.rag.interface import find_core_memory_update_prompt, strip_core_memory_update_prompt, save_batch_memory, start_batch_memory_worker
 
 from static_prompts.compression_prompt import compression_prompt
@@ -22,6 +22,7 @@ from static_prompts.memory_extractor_prompt import memory_extractor_prompt
 from static_prompts.system_prompt import system_prompt
 from static_prompts.title_prompt import title_prompt
 from static_prompts.core_memory_update_prompt import core_memory_update_prompt
+from static_prompts.recall_prompt import recall_prompt
 
 
 # init DB
@@ -56,7 +57,6 @@ def chat():
 
     # initialize workers
     batch_worker = None
-    query_worker = None
 
     file_name = data['uuid'] + '.json'
 
@@ -126,13 +126,55 @@ def chat():
         current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
         print(f'token count after compression: {current_token_count}')
 
-    # reply
+    # prepare for reply
     conversation_data['full_history'].extend(data['messages'])
     conversation_data['current_conversation'].extend(data['messages'])
 
+    # recall from archival memory
+    memory_prompt = []
+
+    completion = client.chat.completions.create(
+        model=MODEL_SMALL_WORKER, 
+        messages=[recall_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'], 
+    )
+    
+    queries = completion.choices[0].message.content
+    print(f'recall queries: {queries}')
+    queries = json.loads(queries)
+    if queries:
+        embeddings = memory_database.get_embeddings(conversation_data['uuid'])
+
+        if embeddings is None:
+            print('no memories found')
+        else:
+            index = normalize_embeddings(*embeddings)
+            recall_results = search_with_queries(queries, index, RECALL_MAX)
+
+            memory_prompt = [
+                {
+                    'role': 'assistant', 
+                    'content': "I recalled these memories from archival memory database to help me with response generation. This message is visible to myself only.\n\n"
+                }
+            ]
+
+            for query, result in zip(queries, recall_results):
+                memory_prompt[0]['content'] += f'QUERY: {query}\nRESULT: \n'
+
+                similarities, indices = result
+                for similarity, index in zip(similarities, indices):
+                    if index == -1:
+                        continue
+
+                    memory = memory_database.retrieve_memory(index)
+                    memory_prompt[0]['content'] += f'{memory['text']}\n'
+                    
+                memory_prompt[0]['content'] += f'\n'
+
+    print(memory_prompt[0]['content'])
+    # generate response
     completion = client.chat.completions.create(
         model=response_model, 
-        messages=[system_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation']
+        messages=[system_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'] + memory_prompt
     )
 
     reply = completion.choices[0].message.content

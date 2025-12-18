@@ -7,12 +7,11 @@ from api.constants import EMBED_MODEL
 
 
 data = input()
+data = json.loads(data)
 
 model = SentenceTransformer(EMBED_MODEL)
 
-data = json.loads(data)
 embeddings = []
-
 for text in data:
     embedding = model.encode(text).tolist()
     embeddings.append(embedding)

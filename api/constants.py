@@ -53,6 +53,9 @@ TTS_OUT_PATH = './voice.ogg'
 # long-term memory storage path
 MEMORY_DB_PATH = './memory/archive.db'
 
+# maximum number of memories to be recalled per search query
+RECALL_MAX = 5
+
 # batch memory update worker path
 BATCH_MEMORY_WORKER_PATH = 'batch_memory_worker.py'
 

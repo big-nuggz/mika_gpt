@@ -37,13 +37,50 @@ def search_with_query(query: str, index: faiss.Index, k=5) -> tuple:
     :return: (similarities: list of float, indices: list of int)
     :rtype: tuple
     '''
-    worker = start_embed_worker(query)
-    query_embedding = np.array(get_embed_from_worker(worker)['embedding'], dtype=np.float32)
-
-    print(f'query: {query}')
+    worker = start_embed_worker([query])
+    query_embedding = np.array(get_embed_from_worker(worker)[0], dtype=np.float32)
 
     faiss.normalize_L2(query_embedding.reshape(1, -1))
 
-    similarities, indices = index.search(query_embedding.reshape(1, -1), 5)
+    similarities, indices = index.search(query_embedding.reshape(1, -1), k)
 
     return similarities[0].tolist(), indices[0].tolist()
+
+def search_with_embedding(embedding: np.ndarray, index: faiss.Index, k=5) -> tuple:
+    '''
+    search with single embedding of query
+    
+    :param embedding: embedding of query string
+    :type embedding: np.ndarray
+    :param index: FAISS index object
+    :type index: faiss.Index
+    :param k: top-k
+    :return: most similar results
+    :rtype: tuple
+    '''
+    faiss.normalize_L2(embedding.reshape(1, -1))
+
+    similarities, indices = index.search(embedding.reshape(1, -1), k)
+
+    return similarities[0].tolist(), indices[0].tolist()
+
+def search_with_queries(queries: list, index: faiss.Index, k=5) -> list:
+    '''
+    returns result of multiple query searches
+    
+    :param queries: list of query strings
+    :type queries: list
+    :param index: FAISS index object
+    :type index: faiss.Index
+    :param k: top-k
+    :return: list of tuples, contains similarity and indices
+    :rtype: list
+    '''
+    worker = start_embed_worker(queries)
+    query_embeddings = get_embed_from_worker(worker)
+
+    result = []
+    for embedding in query_embeddings:
+        result.append(search_with_embedding(np.array(embedding, dtype=np.float32), index, k))
+
+    return result
