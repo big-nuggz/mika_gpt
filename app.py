@@ -139,7 +139,6 @@ def chat():
     )
     
     queries = completion.choices[0].message.content
-    print(f'recall queries: {queries}')
     queries = json.loads(queries)
     if queries:
         embeddings = memory_database.get_embeddings(conversation_data['uuid'])
@@ -167,10 +166,9 @@ def chat():
 
                     memory = memory_database.retrieve_memory(index)
                     memory_prompt[0]['content'] += f'{memory['text']}\n'
-                    
+
                 memory_prompt[0]['content'] += f'\n'
 
-    print(memory_prompt[0]['content'])
     # generate response
     completion = client.chat.completions.create(
         model=response_model, 
