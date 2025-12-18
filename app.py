@@ -14,7 +14,7 @@ from api.tokens import get_token_count_from_chat
 
 from api.rag.db_manager import DBManager
 from api.rag.vector_search import normalize_embeddings, search_with_query
-from api.rag.interface import find_core_memory_update_prompt, strip_core_memory_update_prompt
+from api.rag.interface import find_core_memory_update_prompt, strip_core_memory_update_prompt, save_batch_memory, start_batch_memory_worker
 
 from static_prompts.compression_prompt import compression_prompt
 from static_prompts.default_core_memory import default_core_memory
@@ -54,6 +54,10 @@ def init_conversation():
 def chat():
     data = request.json
 
+    # initialize workers
+    batch_worker = None
+    query_worker = None
+
     file_name = data['uuid'] + '.json'
 
     conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
@@ -81,23 +85,38 @@ def chat():
 
     # if context is too long, compress it
     current_token_count = get_token_count_from_chat(conversation_data['current_conversation'], TOKEN_ENCODER) 
+    print(f'estimated tokens: {current_token_count}')
     if current_token_count >= TOKEN_COMPRESSION_LIMIT:
         print(f'token limit exceeded. tokens: {current_token_count}')
-        print(f'compressing...')
 
-        # compression
+        # memory distillation
+        print(f'distilling archival memory entries')
         completion = client.chat.completions.create(
             model=response_model, 
-            messages=[compression_prompt] + conversation_data['current_conversation'])
+            messages=[memory_extractor_prompt] + conversation_data['current_conversation'], 
+        )
+
+        distilled_memories = completion.choices[0].message.content
+
+        save_batch_memory(distilled_memories, data['uuid'], BATCH_MEMORY_JOB_PATH)
+        
+        print('initiating batched memory updater worker')
+        batch_worker = start_batch_memory_worker(BATCH_MEMORY_JOB_PATH)
+        
+        # compression
+        print(f'compressing current context...')
+
+        completion = client.chat.completions.create(
+            model=response_model, 
+            messages=[compression_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'])
         
         reply = completion.choices[0].message.content
 
         # keep the last user message and a response, for better continuity
         # will sacrifice some tokens but probably better experience
-        conversation_data['current_conversation'] = conversation_data['current_conversation'][-2:]
-        conversation_data['current_conversation'].append({
+        conversation_data['current_conversation'] = [{
                 'role': 'assistant', 'content': reply
-        })
+        }]  + conversation_data['current_conversation'][-2:]
 
         # save the past compression contexts, for future reference
         conversation_data["contexts"].append({
@@ -173,6 +192,13 @@ def chat():
         })
 
     save_json(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+
+    # wait for workers if initiated
+    if batch_worker:
+        print('waiting for batch worker...')
+        stdout, stderr = batch_worker.communicate()
+        print('worker result')
+        print(stdout)
 
     if image_prompt:
         return jsonify(image_reply)
