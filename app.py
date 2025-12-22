@@ -131,6 +131,7 @@ def chat():
     conversation_data['current_conversation'].extend(data['messages'])
 
     # recall from archival memory
+    print('attempting to retrieve relevant memory')
     memory_prompt = []
 
     completion = client.chat.completions.create(
@@ -170,6 +171,7 @@ def chat():
                 memory_prompt[0]['content'] += f'\n'
 
     # generate response
+    print('generating response')
     completion = client.chat.completions.create(
         model=response_model, 
         messages=[system_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'] + memory_prompt
