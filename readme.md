@@ -53,7 +53,12 @@ Inside `./static_prompts`, you can edit the system prompt to change the behavior
 Other prompt files are used to interface the AI with the backend system, so I advise against editing them unless you REALLY know what you're doing. Things can break.
 
 ## Run
+Run the provided `run.bat`
+
+Or, alternatively, activate the virtual environment via shell and run the following command.
+
 `python app.py`
-It should give you a localhost URL in the console to access from your browser.
+
+In either method, it should give you a localhost URL in the console to access from your browser.
 
 **WARNING** do NOT try host this on remote server, it is not secure. This app is intended for local use only.
