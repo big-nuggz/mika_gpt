@@ -1,6 +1,3 @@
-recall_prompt = {
-"role": "system", 
-"content": """
 You generate search queries used to retrieve long-term memories for an AI assistant.
 
 Your task:
@@ -48,6 +45,3 @@ Output:
 "User prefers duck meat over turkey", 
 "User has went to the cinema"
 ]
-
-"""
-}

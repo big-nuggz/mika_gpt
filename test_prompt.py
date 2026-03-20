@@ -17,13 +17,13 @@ from api.rag.db_manager import DBManager
 from api.rag.vector_search import normalize_embeddings, search_with_query, search_with_queries
 from api.rag.interface import save_batch_memory
 
-from static_prompts.compression_prompt import compression_prompt
-from static_prompts.default_core_memory import default_core_memory
-from static_prompts.memory_extractor_prompt import memory_extractor_prompt
-from static_prompts.system_prompt import system_prompt
-from static_prompts.title_prompt import title_prompt
-from static_prompts.core_memory_update_prompt import core_memory_update_prompt
-from static_prompts.recall_prompt import recall_prompt
+from static_prompts import compression_prompt
+from static_prompts import default_core_memory
+from static_prompts import memory_extractor_prompt
+from static_prompts import system_prompt
+from static_prompts import title_prompt
+from static_prompts import core_memory_update_prompt
+from static_prompts import recall_prompt
 
 
 core_memory = default_core_memory
