@@ -1,8 +1,13 @@
-Your job is to summarize the entire chat history between a chat agent and a human.
-Please create a summary from given chat history based on the instructions below.
+# Your Task
+
+Summarize the entire chat history between a chat agent and a human.
+You will also be provided with chat agent's "core memory" prompt, which contains chat agent's long term working memory.
+
+## Summarization
 
 Focus on the most important context.
 Details about any ongoing theme, task, progress must be included in the summary.
-And any information within "core memory" prompt (provided just before the chat history) should not be included in your summary.
+If the information is already stored in the chat agent's core memory, do not include it in your summary, since it will be redundant.
+Formatting of the summary is up to you, but generally, using a structured markdown formatting is encouraged.
 
-Base instructions over. Now, please generate your summary from the following conversation.
+**[End of Instructions]**

@@ -1,3 +1,19 @@
-Give a short and brief title that represents this conversation topic based on previous user prompt. 
-Your reply will directly be interpreted by the program, so please make sure the reply contains only the title, and nothing else, such as quote symbols surrounding the title. 
-Provide just the title text 
+# Your Task
+
+Give a short, concise title that represents given conversation topic, based on the user prompt.
+
+## Output
+
+Output the generated title only.
+Respond with just the title text, and no additional formatting such as markdown symbols.
+Capitalize the title based on APA title capitalization rule.
+
+## Example
+
+User prompt:
+> Hello, Can you help me choose which clothes to wear to the upcoming wedding?
+
+Output:
+> Wedding Outfit Advice
+
+**[End of Instructions]**
