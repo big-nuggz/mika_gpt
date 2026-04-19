@@ -203,3 +203,13 @@ p {
 #button_lobotomy {
 
 }
+
+.core_edit_box {
+    border-radius: 8px;
+    margin-bottom: 24px;
+    width: auto;
+    flex-grow: 1;
+    padding: 8px;
+    line-height: 1.5;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}

@@ -5,6 +5,7 @@ const buttonNewConversation = document.getElementById('button_new_conversation')
 const conversationListBox = document.getElementById('conversations');
 const inputFile = document.getElementById('input_file');
 const buttonContext = document.getElementById('button_context');
+const buttonCore = document.getElementById('button_lobotomy');
 
 const currentConversation = {
     uuid: undefined, 
@@ -34,6 +35,93 @@ async function createNewChat(){
         currentConversation.uuid = data.uuid;
         currentConversation.statusFlag = true;
     }
+}
+
+buttonCore.onclick = async function(){
+    if (currentConversation.uuid === undefined)
+        return;
+
+    if (globalState.viewingContext){
+        loadCurrentConversationHistory();
+        return;
+    }
+
+    messagesContainer.innerHTML = '';
+
+    const response = await fetch('/api/getcore', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            uuid: currentConversation.uuid, 
+        })
+    })
+
+    if (response.ok) {
+        const message_box = document.createElement('textarea');
+        message_box.className = `core_edit_box`
+
+        const history = await response.json();
+
+        history.forEach(message => {
+            content = message.content
+    
+            // for backwards compatibility (since now message can be an array, and all the old messages were pure text)
+            let text_message = null;
+            if (content instanceof Array) {
+                text_message = content[0].text;
+                if (content.length > 1) {
+                    image_box.src = content[1].image_url.url;
+                }
+            }
+            else
+                text_message = content;
+
+            message_box.innerHTML += text_message
+        });
+
+        messagesContainer.appendChild(message_box);
+
+        const button_submit = document.createElement('button');
+        button_submit.innerHTML = "update core memory";
+
+        button_submit.onclick = async (event) => {
+            if (!confirm("Are you sure?")) {
+                return;
+            }
+
+            console.log('updating core memory ' + currentConversation.uuid);
+            
+            const btn_response = await fetch('/api/setcore', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({
+                    uuid: currentConversation.uuid, 
+                    core_memory: [{
+                        role: 'system', 
+                        content: [{
+                            type: 'text', 
+                            text: message_box.value
+                        }]
+                    }]
+                })
+            })
+
+            console.log(message_box.value)
+            console.log(btn_response)
+
+            // console.log(response);
+            globalState.viewingContext = false;
+            loadCurrentConversationHistory();
+        };
+
+        messagesContainer.appendChild(button_submit);
+    }
+
+    globalState.viewingContext = true;
 }
 
 buttonContext.onclick = async function(){

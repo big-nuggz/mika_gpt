@@ -263,6 +263,26 @@ def get_contexts():
 
     return jsonify(conversation_data['contexts'])
 
+@app.route('/api/getcore', methods=['POST'])
+def get_core():
+    data = request.json
+    file_name = data['uuid'] + '.json'
+    conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+
+    return jsonify(conversation_data['core_memory'])
+
+@app.route('/api/setcore', methods=['POST'])
+def set_core():
+    data = request.json
+    file_name = data['uuid'] + '.json'
+    updated_core = data['core_memory']
+    conversation_data = load_conversation_data(os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+
+    conversation_data['core_memory'] = updated_core
+    save_json(conversation_data, os.path.join(CONVERSATION_HISTORY_PATH, file_name))
+
+    return jsonify({'status': 'success'})
+
 @app.route('/api/convlist', methods=['GET'])
 def get_conversation_list():
     file_list = os.listdir(CONVERSATION_HISTORY_PATH)
