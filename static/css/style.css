@@ -14,10 +14,13 @@ p {
 }
 
 #container_chat {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     background-color: rgb(255, 254, 252);
     margin: auto;
     max-width: 1000px;
     height: 100vh;
+    /* overflow: hidden; */
 }
 
 #messages {
@@ -25,7 +28,6 @@ p {
     flex-direction: column;
     position: relative;
     scroll-behavior: smooth;
-    height: calc(100vh - (90px + 12px * 2));
     overflow-y: scroll;
     padding: 12px;
 }
@@ -190,6 +192,14 @@ p {
     padding-bottom: 1em;
 }
 
+#brain_buttons {
+    display: flex;
+}
+
 #button_context {
-    position: absolute;
+
+}
+
+#button_lobotomy {
+
 }
