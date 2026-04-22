@@ -5,7 +5,7 @@ const buttonNewConversation = document.getElementById('button_new_conversation')
 const conversationListBox = document.getElementById('conversations');
 const inputFile = document.getElementById('input_file');
 const buttonContext = document.getElementById('button_context');
-const buttonCore = document.getElementById('brain_surgery);
+const buttonCore = document.getElementById('brain_surgery');
 
 const currentConversation = {
     uuid: undefined, 
