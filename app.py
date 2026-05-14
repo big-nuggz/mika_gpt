@@ -140,8 +140,8 @@ def chat():
     )
     
     queries = completion.choices[0].message.content
-    queries = json.loads(queries)
     if queries:
+        queries = json.loads(queries)
         embeddings = memory_database.get_embeddings(conversation_data['uuid'])
 
         if embeddings is None:
