@@ -16,14 +16,14 @@ if SUPPLIER == 'OPENAI':
     TOKEN_ENCODER = tiktoken.encoding_for_model('gpt-4o')
 
     # openai models
-    MODEL_VISION = 'gpt-5.2-chat-latest'
-    MODEL_NON_VISION = 'gpt-5.2-chat-latest'
-    MODEL_TITLING = 'gpt-5-nano' # tiniest model for titling
-    MODEL_SUMMARIZER = 'gpt-5-nano'
-    MODEL_SMALL_WORKER = 'gpt-5-nano' # used for memory update and such, where small cheap model is enough
+    MODEL_VISION = 'gpt-5.6-terra'
+    MODEL_NON_VISION = 'gpt-5.6-terra'
+    MODEL_TITLING = 'gpt-5.6-luna' # tiniest model for titling
+    MODEL_SUMMARIZER = 'gpt-5.6-luna'
+    MODEL_SMALL_WORKER = 'gpt-5.6-luna' # used for memory update and such, where small cheap model is enough
 
     # image (dall-e)
-    DALLE_MODEL = 'dall-e-2'
+    DALLE_MODEL = 'gpt-image-2'
     IMAGE_RESOLUTION = '256x256'
 elif SUPPLIER == 'GOOGLE':
     # tokenizer
