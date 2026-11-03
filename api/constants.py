@@ -13,11 +13,11 @@ TOKEN_COMPRESSION_LIMIT = 10000 # if token count in chat exceeds this, compress 
 # models
 if SUPPLIER == 'OPENAI':
     # tokenizer
-    TOKEN_ENCODER = tiktoken.encoding_for_model('gpt-4o')
+    TOKEN_ENCODER = tiktoken.encoding_for_model('o200k_base')
 
     # openai models
-    MODEL_VISION = 'gpt-6.1-terra'
-    MODEL_NON_VISION = 'gpt-6.1-terra'
+    MODEL_VISION = 'gpt-6-luna' # honestly the smallest models now are even smarter than the old large models like gpt-4o, so might as well save on the token costs
+    MODEL_NON_VISION = 'gpt-6-luna'
     MODEL_TITLING = 'gpt-6-luna' # tiniest model for titling
     MODEL_SUMMARIZER = 'gpt-6-luna'
     MODEL_SMALL_WORKER = 'gpt-6-luna' # used for memory update and such, where small cheap model is enough
@@ -67,3 +67,6 @@ IMAGE_PROMPT_SEARCH_STRING = r'\{IMAGE_PROMPT\}(.+)\{\/IMAGE_PROMPT\}'
 
 # regex string for core memory update prompt search
 CORE_MEMORY_UPDATE_PROMPT_SEARCH_STRING = r'\{CORE\}(.*?)\{\/CORE\}'
+
+# reasoning
+REASONING_EFFORT = 'none' # I don't think it's necessary, but you can set it to low if you want to

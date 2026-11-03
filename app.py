@@ -93,6 +93,7 @@ def chat():
         print(f'distilling archival memory entries')
         completion = client.chat.completions.create(
             model=response_model, 
+            reasoning_effort=REASONING_EFFORT, 
             messages=[memory_extractor_prompt] + conversation_data['current_conversation'], 
         )
 
@@ -108,6 +109,7 @@ def chat():
 
         completion = client.chat.completions.create(
             model=response_model, 
+            reasoning_effort=REASONING_EFFORT, 
             messages=[compression_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'])
         
         reply = completion.choices[0].message.content
@@ -136,6 +138,7 @@ def chat():
 
     completion = client.chat.completions.create(
         model=MODEL_SMALL_WORKER, 
+        reasoning_effort=REASONING_EFFORT, 
         messages=[recall_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'], 
     )
     
@@ -174,6 +177,7 @@ def chat():
     print('generating response')
     completion = client.chat.completions.create(
         model=response_model, 
+        reasoning_effort=REASONING_EFFORT, 
         messages=[system_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'] + memory_prompt
     )
 
@@ -191,6 +195,7 @@ def chat():
         print('core memory update triggered')
         completion = client.chat.completions.create(
             model=MODEL_SMALL_WORKER, 
+            reasoning_effort=REASONING_EFFORT, 
             messages=[core_memory_update_prompt] + conversation_data['core_memory'] + [{
                 'role': 'system', 
                 'content': core_update

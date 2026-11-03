@@ -10,6 +10,7 @@ def prompt_summarizer(prompt: list, client) -> str:
     '''
     completion = client.chat.completions.create(
         model=MODEL_SUMMARIZER, 
+        reasoning_effort='none', 
         messages=[SUMMARIZER_PROMPT] + prompt
     )
 

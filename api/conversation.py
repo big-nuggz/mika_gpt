@@ -12,6 +12,7 @@ def create_title(client: OpenAI, user_prompt: dict, title_prompt: dict, model: s
     ''' returns a title of the conversation based on given prompt '''
     completion = client.chat.completions.create(
         model=model, 
+        reasoning_effort='none', 
         messages=[title_prompt] + user_prompt
     )
 
