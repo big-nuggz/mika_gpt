@@ -13,7 +13,7 @@ TOKEN_COMPRESSION_LIMIT = 10000 # if token count in chat exceeds this, compress 
 # models
 if SUPPLIER == 'OPENAI':
     # tokenizer
-    TOKEN_ENCODER = tiktoken.encoding_for_model('o200k_base')
+    TOKEN_ENCODER = tiktoken.get_encoding('o200k_base')
 
     # openai models
     MODEL_VISION = 'gpt-6-luna' # honestly the smallest models now are even smarter than the old large models like gpt-4o, so might as well save on the token costs
