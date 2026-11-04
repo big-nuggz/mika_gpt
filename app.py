@@ -139,7 +139,7 @@ def chat():
     completion = client.chat.completions.create(
         model=MODEL_SMALL_WORKER, 
         reasoning_effort=REASONING_EFFORT, 
-        messages=[recall_prompt] + conversation_data['core_memory'] + conversation_data['current_conversation'], 
+        messages=[recall_prompt] + [conversation_data['current_conversation'][-1]], 
     )
     
     queries = completion.choices[0].message.content
